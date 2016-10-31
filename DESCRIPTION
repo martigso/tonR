@@ -1,0 +1,10 @@
+Package: tonR
+Type: Package
+Title: Tools for operating the Talk of Norway dataset
+Version: 0.1.0
+Author: Søyland, Martin G., Lapponi, Emanuele
+Maintainer: Søyland, Martin G. <m.g.soyland@stv.uio.no>
+Description: This package provides tools for reading and handling data in the Talk of Norway specification of CoNLL data format. The main project repository and data can be found in the Github repository at https://github.com/emanlapponi/talk-of-norway.
+License: GPL-3
+LazyData: TRUE
+RoxygenNote: 5.0.1
