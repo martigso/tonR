@@ -4,10 +4,17 @@
 \alias{read.conll}
 \title{Read CoNLL-type data from Talk of Norway}
 \usage{
-read.conll(file)
+read.conll(id, keep = "all", rmStopwords = TRUE, rmLength = 1000)
 }
 \arguments{
-\item{file}{Character string specifying the path to .tsv-file to read into R}
+\item{tonFolder}{Character vector specifying either absolute or relative path to the talk-of-norway repository folder}
+
+\item{id}{Character string specifying id of the file to read into R.}
+
+\item{keep}{Character string that specifies what parts-of-speech should be returned. Possible values are:
+"subst", "verb", "sbu", "prep", "det", "adj", "clb", "adv", "pron", "<komma>", "konj".}
+
+\item{rmWords}{Character vector of either "no" or of words to remove.}
 }
 \description{
 A function for reading the CoNLL data used in the Talk of Norway project for legislative speeches
