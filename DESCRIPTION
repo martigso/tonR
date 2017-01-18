@@ -7,6 +7,9 @@ Author@R: Martin Soyland <m.g.soyland@stv.uio.no> [aut, cre] and Emanuele Lappon
 Maintainer: Martin Soyland <m.g.soyland@stv.uio.no>
 Description: This package provides tools for reading and handling data in the Talk of Norway specification of CoNLL data format. The main project repository and data can be found in the Github repository at https://github.com/emanlapponi/talk-of-norway.
 Depends: R (>= 3.3)
+Imports:
+  dplyr,
+  parallel
 License: GPL-3
 URL: https://github.com/martigso/tonR, https://github.com/emanlapponi/talk-of-norway, https://github.com/emanlapponi/storting
 LazyData: TRUE

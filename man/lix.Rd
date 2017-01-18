@@ -4,7 +4,7 @@
 \alias{lix}
 \title{LIX readability score for Norwegian}
 \usage{
-liks(actual, pred)
+lix(actual, pred)
 }
 \arguments{
 \item{n_words}{Integer specifying number of words in a document}

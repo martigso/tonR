@@ -19,7 +19,7 @@
 #' # To be done
 #' @export
 #'
-Fscores_boot <- function(data, actual, pred, subset_rows, nsim = 1000, seed = 8949, cores){
+Fscores_boot <- function(data, actual, pred, subset_rows, nsim = 1000, seed = 8949, cores = 1){
 
   full_data <- lapply(pred, function(x){
     tonR::Fscores_maker(data[subset_rows, ], actual, x)
@@ -29,7 +29,7 @@ Fscores_boot <- function(data, actual, pred, subset_rows, nsim = 1000, seed = 89
   set.seed(seed)
 
   agg <- list()
-  if((suppressWarnings(require(parallel, quietly = TRUE)) == TRUE) & (Sys.info()[1] == "Linux")){
+  if(Sys.info()["sysname"] != "Linux"){
     agg <- lapply(1:nsim, function(x){
 
       rows <- sample(1:nrow(data[subset_rows, ]), ceiling(nrow(data[subset_rows, ]) / 2))
@@ -60,7 +60,7 @@ Fscores_boot <- function(data, actual, pred, subset_rows, nsim = 1000, seed = 89
       names(sim) <- pred
 
       return(sim)
-    })
+    }, mc.cores = cores)
   }
 
   fscore_data <- list(full_data = full_data,

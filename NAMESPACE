@@ -3,4 +3,5 @@
 export(Fscores_boot)
 export(Fscores_maker)
 export(lix)
+export(lix_ton)
 export(read.conll)
