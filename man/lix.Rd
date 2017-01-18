@@ -2,7 +2,7 @@
 % Please edit documentation in R/lix.R
 \name{lix}
 \alias{lix}
-\title{LIX readability score for Norwegian}
+\title{LIX readability score}
 \usage{
 lix(actual, pred)
 }

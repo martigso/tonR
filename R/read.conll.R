@@ -1,9 +1,9 @@
-#' Read CoNLL-type data from Talk of Norway
+#' Read CoNLL-type data
 #'
 #' A function for reading the CoNLL data used in the Talk of Norway project for legislative speeches
-#' in the Norwegian parliament (1998-2016). Operates as a wrapper for \code{\link[utils]{read.csv}}
+#' in the Norwegian parliament (1998-2016). Works as a wrapper for \code{\link[utils]{read.csv}}
 #'
-#' @usage read.conll(id, keep = "all", rmStopwords = TRUE, rmLength = 1000)
+#' @usage read.conll(tonFolder, id, keep = "all", rmStopwords = TRUE, rmLength = 1000)
 #'
 #' @param tonFolder Character vector specifying either absolute or relative path to the talk-of-norway repository folder
 #' @param id Character string specifying id of the file to read into R.
@@ -11,13 +11,25 @@
 #'        "subst", "verb", "sbu", "prep", "det", "adj", "clb", "adv", "pron", "<komma>", "konj".
 #' @param rmWords Character vector of either "no" or of words to remove.
 #'
+#' @return A data frame of the ToN speech specified by \code{id}, with sentence and token boundries, tokens, lemmatized
+#' tokens, parts-of-speech tagging, and morpheme features.
+#'
 #' @family CoNLL
 #' @seealso \code{\link[utils]{read.csv}}
 #'
 #' @examples
-#' # If the 'talk-of-norway' repository is placed in the folder below the tonR-package:
+#' # If the 'talk-of-norway' repository is placed in the folder below the tonR-package
 #' speech <- read.conll("../talk-of-norway/data/annotations/tale100001.tsv")
 #' barplot(table(speech$part_of_speech))
+#'
+#' # Loading a subset of speeches using several ToN id tags
+#' data("tonDemo")
+#'
+#' texts <- lapply(tonDemo$id[1:10], function(x){
+#'   read.conll(tonFolder = "../talk-of-norway/", id = x, keep = "adj")
+#' })
+#' lapply(texts, head)
+#'
 #' @export
 read.conll <- function(tonFolder,
                        id,
@@ -31,7 +43,7 @@ read.conll <- function(tonFolder,
   conll_df <- read.csv(file, sep = "\t", header = FALSE, stringsAsFactors = FALSE, quote = "",
                        row.names = NULL)
   if(ncol(conll_df) == 5){
-    colnames(conll_df) <- c("index", "token", "lemma", "part_of_speech", "features")
+    colnames(conll_df) <- c("index", "token", "lemma", "part_of_speech", "morph")
   }
 
   # Reformatting the CoNLL-format from newline = new sentence to numeric sentence count variable
@@ -52,6 +64,6 @@ read.conll <- function(tonFolder,
   if(rmWords != "no"){
     conll_df <- conll_df[which((conll_df$token %in% rmWords) == FALSE), ]
   }
-
+  conll_df$id <- id
   return(conll_df)
 }

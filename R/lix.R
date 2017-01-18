@@ -1,4 +1,4 @@
-#' LIX readability score for Norwegian
+#' LIX readability score
 #'
 #' A function for calculating the LIX readability score
 #'
