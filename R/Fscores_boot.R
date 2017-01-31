@@ -2,7 +2,7 @@
 #'
 #' A function for calculating F_1 scores based on SVM evaluations
 #'
-#' @usage Fscores_maker(actual, pred)
+#' @usage Fscores_boot(data, actual, pred, subset_rows, nsim = 1000, seed = 8949, cores = 1)
 #'
 #' @param data Data frame containing the actual and predicted values of the property under consideration
 #' @param actual Character string of the column name of the the actual values of the property under consideration
@@ -29,7 +29,7 @@ Fscores_boot <- function(data, actual, pred, subset_rows, nsim = 1000, seed = 89
   set.seed(seed)
 
   agg <- list()
-  if(Sys.info()["sysname"] != "Linux"){
+  if(.Platform$OS.type == "windows"){
     agg <- lapply(1:nsim, function(x){
 
       rows <- sample(1:nrow(data[subset_rows, ]), ceiling(nrow(data[subset_rows, ]) / 2))

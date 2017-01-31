@@ -4,7 +4,7 @@
 \alias{Fscores_boot}
 \title{Bootstrap F_1 scores based on SVM evaluations}
 \usage{
-Fscores_maker(actual, pred)
+Fscores_boot(data, actual, pred, subset_rows, nsim = 1000, seed = 8949, cores = 1)
 }
 \arguments{
 \item{data}{Data frame containing the actual and predicted values of the property under consideration}
