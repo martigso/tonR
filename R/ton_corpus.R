@@ -18,7 +18,7 @@
 #' quanteda::docnames(test)
 #' @export
 #'
-ton_corpus <- function(tonFolder, ids, cores = NULL){
+ton_corpus <- function(tonFolder, ids, feature_type = "token", cores = NULL){
 
   if (!requireNamespace("gsubfn", quietly = TRUE)) {
     stop("The package 'gsubfn' needed for this function to work. Please install it.",
@@ -55,10 +55,25 @@ ton_corpus <- function(tonFolder, ids, cores = NULL){
       cores <- ifelse(cores < 1, 1, cores)
     }
 
-    # Read only tokes for each speech
-    texts <- parallel::mclapply(ids, function(x){
-      paste(read.conll(tonFolder, x)$token, collapse = " ")
-    }, mc.cores = cores)
+    # Read specified features for each speech
+    if(feature_type == "token"){
+      texts <- parallel::mclapply(ids, function(x){
+        paste(read.conll(tonFolder, x)$token, collapse = " ")
+      }, mc.cores = cores)
+    } else if(feature_type == "lemma"){
+      texts <- parallel::mclapply(ids, function(x){
+        tmp <- paste(read.conll(tonFolder, x)$lemma, collapse = " ")
+        tmp <- gsub("\\$", "", tmp)
+        return(tmp)
+      }, mc.cores = cores)
+    } else if(feature_type == "lemma_pos"){
+      texts <- parallel::mclapply(ids, function(x){
+        tmp <- read.conll(tonFolder, x)
+        tmp <- paste0("lemma/pos:", tmp$lemma, "/", tmp$part_of_speech)
+        tmp <- paste(tmp, collapse = " ")
+        return(tmp)
+      }, mc.cores = cores)
+    }
 
     # Fix punctuation spacing
     texts <- parallel::mclapply(texts, function(x){
