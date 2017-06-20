@@ -7,7 +7,8 @@
 #'
 #' @param tonFolder Character vector specifying either absolute or relative path to the talk-of-norway repository folder
 #' @param id Character string specifying id of the file to read into R.
-#' @param keep Character string that specifies what parts-of-speech should be returned. Possible values are:
+#' @param keep_features Character string specifying which features to extract. Defaults to c("", "", "", "", "",)
+#' @param keep_pos Character string that specifies what parts-of-speech should be returned. Possible values are:
 #'        "subst", "verb", "sbu", "prep", "det", "adj", "clb", "adv", "pron", "<komma>", "konj".
 #' @param rmWords Character vector of either "no" or of words to remove.
 #'
@@ -19,29 +20,32 @@
 #'
 #' @examples
 #' # If the 'talk-of-norway' repository is placed in the folder below the tonR-package
-#' speech <- read.conll("../talk-of-norway/data/annotations/tale100001.tsv")
+#' speech <- read.conll("../talk-of-norway/", "tale100001")
 #' barplot(table(speech$part_of_speech))
 #'
 #' # Loading a subset of speeches using several ToN id tags
 #' data("tonDemo")
 #'
 #' texts <- lapply(tonDemo$id[1:10], function(x){
-#'   read.conll(tonFolder = "../talk-of-norway/", id = x, keep = "adj")
+#'   read.conll(tonFolder = "../talk-of-norway/", id = x, keep_pos = "adj")
 #' })
 #' lapply(texts, head)
 #'
 #' @export
 read.conll <- function(tonFolder,
                        id,
-                       keep = "all",
+                       keep_pos = "all",
                        rmWords = "no",
                        rmLength = 1000){
+
+  tonFolder <- gsub("\\/$", "", tonFolder)
 
   file <- paste0(tonFolder, "/data/annotations/", id, ".tsv")
 
   # Reading the data
   conll_df <- read.csv(file, sep = "\t", header = FALSE, stringsAsFactors = FALSE, quote = "",
                        row.names = NULL)
+
   if(ncol(conll_df) == 5){
     colnames(conll_df) <- c("index", "token", "lemma", "part_of_speech", "morph")
   }
@@ -54,16 +58,19 @@ read.conll <- function(tonFolder,
     }
   }
 
-  # Reordering the variable order
-  conll_df <- conll_df[, c("sentence", names(conll_df[1:(ncol(conll_df)-1)]))]
+  conll_df$id <- id
 
-  if(("all" %in% keep) == FALSE){
-    conll_df <- conll_df[which(conll_df$part_of_speech %in% keep), ]
+  # Reordering the variable order
+  conll_df <- conll_df[, c("id", "sentence", names(conll_df[1:(ncol(conll_df)-2)]))]
+
+  if(("all" %in% keep_pos) == FALSE){
+    conll_df <- conll_df[which(conll_df$part_of_speech %in% keep_pos), ]
   }
 
   if(rmWords != "no"){
     conll_df <- conll_df[which((conll_df$token %in% rmWords) == FALSE), ]
   }
-  conll_df$id <- id
+
+
   return(conll_df)
 }
