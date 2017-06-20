@@ -13,9 +13,26 @@ Fscores_maker(actual, pred)
 
 \item{pred}{Character string of the column name of the the predicted values of the property under consideration.
 Must be same length as \code{actual}.}
+
+\item{parties}{Logical vector specifying if \code{actual} and \code{pred} is party labels}
+}
+\value{
+Returns a list with a data frame of F-scores, precision, and recall for each class, macro averaged F-score, and accuracy.
 }
 \description{
 A function for calculating F_1 scores based on SVM evaluations
+}
+\details{
+The F-scores are calculated as a product of true positives (TP), false negatives (FN), and false positives (FP).
+
+Precision:
+\deqn{P = TP / (TP + FP)}
+
+Recall:
+\deqn{R = TP / (TP + FN)}
+
+F-score:
+\deqn{F = 2 * ((P * R) / (P + R))}
 }
 \examples{
 data(tonDemo)

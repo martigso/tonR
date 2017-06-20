@@ -8,6 +8,21 @@
 #' @param actual Character string of the column name of the the actual values of the property under consideration
 #' @param pred Character string of the column name of the the predicted values of the property under consideration.
 #'        Must be same length as \code{actual}.
+#' @param parties Logical vector specifying if \code{actual} and \code{pred} is party labels
+#'
+#' @details The F-scores are calculated as a product of true positives (TP), false negatives (FN), and false positives (FP).
+#'
+#' Precision:
+#' \deqn{P = TP / (TP + FP)}
+#'
+#' Recall:
+#' \deqn{R = TP / (TP + FN)}
+#'
+#' F-score:
+#' \deqn{F = 2 * ((P * R) / (P + R))}
+#'
+#' @return Returns a list with a data frame of F-scores, precision, and recall for each class, macro averaged F-score, and accuracy.
+#'
 #'
 #' @family fscores
 #' @seealso \code{\link[e1071]{svm}}
@@ -18,19 +33,25 @@
 #' Fscores_maker(tonDemo, "party_id", "class_token")
 #' @export
 #'
-Fscores_maker <- function(data = NULL, actual, pred){
+Fscores_maker <- function(data = NULL, actual, pred, parties = FALSE){
 
-  if(is.null(data) == FALSE){
+  if(is.null(data) == FALSE & parties == TRUE){
 
-    data[, actual] <- factor(data[, actual], levels = c("SV", "A", "Sp", "KrF", "V", "H", "FrP"))
-    data[, pred] <- factor(data[, pred], levels = c("SV", "A", "Sp", "KrF", "V", "H", "FrP"))
+    actual <- droplevels(factor(data[, actual], levels = c("SV", "A", "Sp", "KrF", "V", "H", "FrP")))
+    pred <- droplevels(factor(data[, pred], levels = c("SV", "A", "Sp", "KrF", "V", "H", "FrP")))
 
-    baseline <- as.matrix(table(actual = data[, actual], pred = data[, pred]))
+    baseline <- as.matrix(table(actual, pred))
 
-  } else {
+  } else if(is.null(data) == TRUE & parties == TRUE){
 
-    actual <- factor(actual, levels = c("SV", "A", "Sp", "KrF", "V", "H", "FrP"))
-    pred <- factor(pred, levels = c("SV", "A", "Sp", "KrF", "V", "H", "FrP"))
+    actual <- droplevels(factor(actual, levels = c("SV", "A", "Sp", "KrF", "V", "H", "FrP")))
+    pred <- droplevels(factor(pred, levels = c("SV", "A", "Sp", "KrF", "V", "H", "FrP")))
+
+    baseline <- as.matrix(table(actual, pred))
+
+  } else if(is.null(data) == FALSE & parties == FALSE){
+    actual <- factor(data[, actual])
+    pred <- factor(data[, pred])
 
     baseline <- as.matrix(table(actual, pred))
   }
@@ -50,9 +71,11 @@ Fscores_maker <- function(data = NULL, actual, pred){
   f1 <- 2 * precision * recall / (precision + recall)
   f1_macro <- 2 * mean(precision) * mean(recall) / (mean(precision) + mean(recall))
 
-  out <- data.frame(labs = rownames(baseline),
-                    precision, recall, f1, f1_macro, accuracy,
-                    stringsAsFactors = FALSE, row.names = NULL)
+  out <- list(f1 = data.frame(labs = rownames(baseline),
+                    precision, recall, f1,
+                    stringsAsFactors = FALSE, row.names = NULL),
+              f1_macro = f1_macro,
+              accuracy = accuracy)
 
   return(out)
 }
