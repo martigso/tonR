@@ -19,12 +19,13 @@
 #' # To be done
 #' @export
 #'
-Fscores_boot <- function(data, actual, pred, subset_rows, nsim = 1000, seed = 8949, cores = 1){
+Fscores_boot <- function(data, actual, pred,
+                         sample_divider = 2, nsim = 1000, seed = 8949,
+                         cores = 1){
 
-  full_data <- lapply(pred, function(x){
-    tonR::Fscores_maker(data[subset_rows, ], actual, x)
-  })
-  names(full_data) <- pred
+  full_data <- tonR::Fscores_maker(data, actual, pred)
+
+  names(full_data) <- c(pred, "f1_macro", "accuracy")
 
   set.seed(seed)
 
@@ -32,39 +33,47 @@ Fscores_boot <- function(data, actual, pred, subset_rows, nsim = 1000, seed = 89
   if(.Platform$OS.type == "windows"){
     agg <- lapply(1:nsim, function(x){
 
-      rows <- sample(1:nrow(data[subset_rows, ]), ceiling(nrow(data[subset_rows, ]) / 2))
+      rows <- sample(1:nrow(data), ceiling(nrow(data) / sample_divider))
 
-      sim <- list()
-      sim <- lapply(pred, function(y) {
-        tmp <- data.frame(tmp_actual = data[rows, actual],
-                          tmp_pred = data[rows, y],
-                          stringsAsFactors = FALSE)
-        tonR::Fscores_maker(tmp, actual = "tmp_actual", pred = "tmp_pred")
-      })
-
-      names(sim) <- pred
+      sim <- tonR::Fscores_maker(data[rows, ], actual, pred)
 
       return(sim)
 
     })
-  } else {
-    agg <- mclapply(1:nsim, function(x){
+  } else if(.Platform$OS.type == "unix"){
 
-      rows <- sample(1:nrow(data[subset_rows, ]), ceiling(nrow(data[subset_rows, ]) / 2))
+    library(pbmcapply)
 
-      sim <- list()
-      sim <- lapply(pred, function(x) {
-        tonR::Fscores_maker(data = NULL, actual = data[rows, actual], pred = data[rows, x])
-      })
+    agg <- pbmclapply(1:nsim, function(x){
 
-      names(sim) <- pred
+      rows <- sample(1:nrow(data), ceiling(nrow(data) / sample_divider))
+
+      sim <- tonR::Fscores_maker(data[rows, ], actual, pred)
 
       return(sim)
     }, mc.cores = cores)
+  } else {
+    stop(paste("Can not recognize operating system '"), .Platform$OS.type, "'")
   }
 
-  fscore_data <- list(full_data = full_data,
+  fscore_data <- list(f1_full_data = full_data,
                       sims = agg)
+
+  fscore_data$f1_macro_conf <- quantile(unlist(lapply(fscore_data$sims, function(x) x$f1_macro)), probs = c(.05, .5, .95))
+
+  fscore_data$f1_sims <- do.call("cbind", lapply(fscore_data$sims, function(x){
+    x$f1$f1
+  }))
+
+  rownames(fscore_data$f1_sims) <- fscore_data$f1_full_data[[pred]]$labs
+
+  fscore_data$f1_sims_conf <- data.frame(t(apply(fscore_data$f1_sims, 1, quantile, probs = c(.05, .5, .95))))
+
+  colnames(fscore_data$f1_sims_conf) <- c("lwr", "m", "upr")
+
+  fscore_data$f1_sims_conf$labs <- rownames(fscore_data$f1_sims_conf)
+  rownames(fscore_data$f1_sims_conf) <- 1:nrow(fscore_data$f1_sims_conf)
+  fscore_data$f1_sims_conf <- fscore_data$f1_sims_conf[, c("labs", "lwr", "m", "upr")]
 
   return(fscore_data)
 }

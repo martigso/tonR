@@ -14,11 +14,11 @@ Fscores_boot(data, actual, pred, subset_rows, nsim = 1000, seed = 8949, cores = 
 \item{pred}{Character string of the column name of the the predicted values of the property under consideration.
 Must be same length as \code{actual}.}
 
-\item{subset_rows}{A vector containing the rownames for the data to bootstrap. For full data use \code{subset_rows = rownames(data)}}
-
 \item{nsim}{Integer specifying number of bootstraps to do.}
 
 \item{cores}{Integer specifying number of cores to simulate on. For Linux users only...sorry Windows.}
+
+\item{subset_rows}{A vector containing the rownames for the data to bootstrap. For full data use \code{subset_rows = rownames(data)}}
 }
 \description{
 A function for calculating F_1 scores based on SVM evaluations
