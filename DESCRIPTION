@@ -11,7 +11,9 @@ Imports:
   dplyr,
   parallel,
   quanteda,
-  gsubfn
+  gsubfn,
+  pbmcapply,
+  tidytext
 License: GPL-3
 URL: https://github.com/martigso/tonR, https://github.com/emanlapponi/talk-of-norway, https://github.com/emanlapponi/storting
 LazyData: TRUE
