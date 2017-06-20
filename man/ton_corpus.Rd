@@ -21,6 +21,8 @@ A function for reading selected ToN texts to a corpus. Builds on
 }
 \examples{
 test <- ton_corpus(tonFolder = "../talk-of-norway/", ids = c("tale000005", "tale000006"))
+summary(test)
+quanteda::docnames(test)
 }
 \seealso{
 \code{\link[corpus]{quanteda}}
